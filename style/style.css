@@ -18,9 +18,9 @@ header {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
+  -webkit-box-pack: space-around;
+      -ms-flex-pack: space-around;
+          justify-content: space-around;
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
@@ -510,7 +510,7 @@ button.dark {
 @media screen and (max-width:500px) {
 
   #main-heading {
-    font-size: 1rem;
+    font-size: 2rem;
   }
 
   .toggle_switch {
