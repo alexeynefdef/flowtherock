@@ -169,8 +169,6 @@ form>button:active {
 }
 
 #side_button {
-  position: absolute;
-  right: -40px;
   font-family: 'Nabla', cursive;
   border: none;
   background: none;
