@@ -13,9 +13,14 @@
     <title>Flow The Rock</title>
   </head>
 
-  <body>
-    <div class="side-card hide" id="side-card">
+  <body onload="isLoggedIn()">
+    <div id="totop">
+      <a href="#main-heading" class="totop"
+        ><i class="fa-solid fa-arrow-up"></i
+      ></a>
+    </div>
 
+    <div class="side-card hide" id="side-card">
       <p>Played</p>
       <div class="side_button_wrapper">
         <form action="javascript:;" onsubmit="clearPlaylist()">
@@ -34,9 +39,7 @@
     </div>
 
     <header>
-      <button id="side_button">
-        <a href="#main-heading" id="side_button-link"> > </a>
-      </button>
+      <button id="side_button">></button>
       <h1 id="main-heading" class="main-head light">Flow The Rock</h1>
       <div class="toggle_switch">
         <input type="checkbox" class="checkbox" id="chk" />
@@ -48,11 +51,14 @@
       </div>
     </header>
     <div class="main_wrapper">
+      <a href="./playlists.html" class="backtoplaylists"
+        ><i class="fa-solid fa-arrow-left"></i>Back to your playlists</a
+      >
       <form action="javascript:;" onsubmit="loadPlaylist(this)">
         <button type="submit">Load</button>
       </form>
       <form action="javascript:;" onsubmit="reloadPlaylist(this)">
-        <button type="submit">Reload</button>
+        <button id="reload-button" type="submit">Reload</button>
       </form>
 
       <div class="now_playing">

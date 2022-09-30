@@ -1,4 +1,19 @@
+function isLoggedIn() {
+  if (getCookie("loggedin") != "true") {
+    window.open("./login.html", "_self");
+  } else {
+    loadPlaylist();
+  }
+}
+
 function loadPlaylist() {
+  document.getElementById("tracklist").innerHTML =
+    "<dt id='tracklist-head' class='tracklist_item tracklist_item-head'>" +
+    "<div class='tracklist_item-head-data'>Title</div>" +
+    "<div class='tracklist_item-head-data'>Artist</div>" +
+    "<div class='tracklist_item-head-data'>BPM</div>" +
+    "<div class='tracklist_item-head-data'>Key</div>" +
+    "</dt>";
   document.getElementById("loader_wrapper").classList.add("loading");
   document.getElementById("footer").classList.remove("loaded");
   const opt = {
@@ -13,6 +28,15 @@ function loadPlaylist() {
 }
 
 function reloadPlaylist() {
+  document.getElementById("tracklist").innerHTML =
+    "<dt id='tracklist-head' class='tracklist_item tracklist_item-head'>" +
+    "<div class='tracklist_item-head-data'>Title</div>" +
+    "<div class='tracklist_item-head-data'>Artist</div>" +
+    "<div class='tracklist_item-head-data'>BPM</div>" +
+    "<div class='tracklist_item-head-data'>Key</div>" +
+    "</dt>";
+  document.getElementById("loader_wrapper").classList.add("loading");
+  document.getElementById("footer").classList.remove("loaded");
   const opt = {
     method: "GET",
     headers: new Headers({
@@ -179,10 +203,27 @@ chk.addEventListener("change", () => {
 //side card
 document.getElementById("side_button").addEventListener("click", () => {
   document.getElementById("side-card").classList.toggle("hide");
-  let sideButton = document.getElementById("side_button-link");
+  let sideButton = document.getElementById("side_button");
   if (sideButton.textContent == "<") {
     sideButton.textContent = ">";
   } else {
     sideButton.textContent = "<";
   }
 });
+
+//Get cookie
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(";");
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == " ") {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
