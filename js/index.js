@@ -2,8 +2,42 @@ function isLoggedIn() {
   if (getCookie("loggedin") != "true") {
     window.open("./login.html", "_self");
   } else {
-    loadPlaylist();
+    reloadPlaylist(getUrlParam("playlistId"));
   }
+}
+
+if (getCookie("dark") != "true") {
+  document.body.classList.add("dark");
+  document.getElementById("tracklist-head").classList.add("dark");
+  document.getElementById("main-heading").classList.add("light");
+  let buttons = document.getElementsByTagName("button");
+  for (const button of buttons) {
+    button.classList.add("dark");
+  }
+
+  let isDark = false;
+  let bodyClassList = document.body.classList;
+  bodyClassList.forEach((className) => {
+    if (className === "dark") {
+      isDark = true;
+    }
+  });
+
+  let items = document.getElementsByTagName("dd");
+  for (const item of items) {
+    item.classList.add("dark");
+  }
+  
+} 
+
+function getUrlParam(param) {
+  let query = window.location.search;
+  const urlParams = new URLSearchParams(query);
+  return urlParams.get(param);
+}
+
+function backToPlaylists() {
+  window.open("./playlists.html", "_self");
 }
 
 function loadPlaylist() {
@@ -27,7 +61,7 @@ function loadPlaylist() {
     .then((json) => parseResponse(json));
 }
 
-function reloadPlaylist() {
+function reloadPlaylist(playlistId) {
   document.getElementById("tracklist").innerHTML =
     "<dt id='tracklist-head' class='tracklist_item tracklist_item-head'>" +
     "<div class='tracklist_item-head-data'>Title</div>" +
@@ -44,7 +78,7 @@ function reloadPlaylist() {
     }),
   };
   document.getElementById("loader_wrapper").classList.add("loading");
-  fetch("http://164.90.185.125:8080/flowtherock/playlist/reload", opt)
+  fetch("http://164.90.185.125:8080/flowtherock/playlist/load?playlistId=" + playlistId, opt)
     .then((response) => response.json())
     .then((json) => parseResponse(json));
 }
@@ -198,7 +232,11 @@ chk.addEventListener("change", () => {
   for (const item of items) {
     item.classList.toggle("dark");
   }
+
+  document.cookie = "dark=true";
 });
+
+
 
 //side card
 document.getElementById("side_button").addEventListener("click", () => {

@@ -51,9 +51,9 @@
       </div>
     </header>
     <div class="main_wrapper">
-      <a href="./playlists.html" class="backtoplaylists"
-        ><i class="fa-solid fa-arrow-left"></i>Back to your playlists</a
-      >
+      <form action="javascript:;" onsubmit="backToPlaylists()">
+        <button type="submit"><i class="fa-solid fa-arrow-left"></i>Back to your playlists</button>
+      </form>
       <form action="javascript:;" onsubmit="loadPlaylist(this)">
         <button type="submit">Load</button>
       </form>

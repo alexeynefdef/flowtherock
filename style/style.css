@@ -478,7 +478,8 @@ body.dark {
 }
 
 .tracklist_item.dark,
-button.dark {
+button.dark,
+.playlist-list.dark {
   border: solid 2px #fff;
 }
 
@@ -732,4 +733,9 @@ img.playlist-item {
 
 .playlist-item>* {
   font-family: 'Bebas Neue', cursive;
+}
+
+.playlist-item>h3,
+.playlist-item>p {
+  text-align: right;
 }

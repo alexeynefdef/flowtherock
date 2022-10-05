@@ -1,11 +1,17 @@
-//login
-function login() {
-  const admin = "alex.nefdef@gmail.com";
-  const adminPass = "admin";
-  let email = document.getElementById("email").value;
-  let pass = document.getElementById("password").value;
-  if (email === admin && pass === adminPass) {
-    document.cookie = "loggedin=true";
-    window.open("./index.html", "_self");
-  }
+const CLIENT_ID = "";
+
+function loginWithSpotify() {
+
+  let params = new URLSearchParams({
+    response_type: "code",
+    client_id: CLIENT_ID,
+    scope: "user-library-read",
+    redirect_uri: "http://164.90.185.125/playlists.html"
+  });
+
+  let uri = "https://accounts.spotify.com/authorize?" + params.toString();
+
+  document.cookie = "loggedin=true";
+  window.open(uri, "_self");
+
 }
