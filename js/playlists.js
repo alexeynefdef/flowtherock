@@ -1,35 +1,44 @@
-function isLoggedIn() {
-  if (getCookie("loggedin") != "true") {
-    window.open("./login.html", "_self");
+function loadUserData() {
+  if (getCookie("loggedin") == "true") {
+    const opt = {
+      method: "GET",
+      headers: new Headers({
+        "Access-Control-Allow-Origin": "http://164.90.185.125:8080",
+      }),
+    };
+    fetch("http://164.90.185.125:8080/flowtherock/api/user", opt)
+      .then((response) => response.json())
+      .then((json) => parseUserData(json))
+      .then(this.loadAllPlaylists());
   } else {
-    let code = getCode();
-    if(code != null && code != "") {
-      loadAllPlaylists(code);
-    } else {
-      getAllPlaylists();
-    }
+    window.open("./login.html", "_self");
   }
 }
 
-function getCode() {
-  let query = window.location.search;
-  const urlParams = new URLSearchParams(query);
-  return urlParams.get("code");
+function parseUserData(user) {
+  //let id = user.id;
+  let email = user.email;
+  let name = user.name;
+  let img = user.img;
+
+  let data  = '';
+  data += '<div class="user-data" id="user-img"> ';
+  data += '<img src="' + img + '" >';
+  data += ' </div>';
+  data += '<div class="user-data" id="user-name"> ';
+  data += '<h1>';
+  data += name;
+  data += '</h1>';
+  data += ' </div>';
+  data += '<div class="user-data" id="user-email"> ';
+  data += '<h3>';
+  data += email;
+  data += '</h3>';
+  data += ' </div>';
+  document.getElementById("user-data-box").innerHTML += data;  
 }
 
-function getAllPlaylists() {
-  const opt = {
-    method: "GET",
-    headers: new Headers({
-      "Access-Control-Allow-Origin": "http://164.90.185.125:8080",
-    }),
-  };
-  fetch("http://164.90.185.125:8080/flowtherock/playlists", opt)
-    .then((response) => response.json())
-    .then((json) => parsePlaylists(json));
-}
-
-function loadAllPlaylists(code) {
+function loadAllPlaylists() {
   document.getElementById("loader_wrapper").classList.add("loading");
   const opt = {
     method: "GET",
@@ -37,7 +46,7 @@ function loadAllPlaylists(code) {
       "Access-Control-Allow-Origin": "http://164.90.185.125:8080",
     }),
   };
-  fetch("http://164.90.185.125:8080/flowtherock/playlists/load?code=" + code, opt)
+  fetch("http://164.90.185.125:8080/flowtherock/api/playlists", opt)
     .then((response) => response.json())
     .then((json) => parsePlaylists(json));
 }
@@ -82,7 +91,7 @@ function appendPlaylist(playlist) {
 }
 
 function openPlaylist(playlistId) {
-  window.open("./index.html?playlistId=" + playlistId + "&code=" + getCode(), "_self");
+  window.open("./tracks.html?playlistId=" + playlistId, "_self");
 }
 
 //Get cookie
@@ -101,72 +110,3 @@ function getCookie(cname) {
   }
   return "";
 }
-
-//toggle
-const chk = document.getElementById("chk");
-
-chk.addEventListener("change", () => {
-  document.body.classList.toggle("dark");
-  document.getElementById("main-heading").classList.toggle("light");
-  let buttons = document.getElementsByTagName("button");
-  for (const button of buttons) {
-    button.classList.toggle("dark");
-  }
-
-  let isDark = false;
-  let bodyClassList = document.body.classList;
-  bodyClassList.forEach((className) => {
-    if (className === "dark") {
-      isDark = true;
-    }
-  });
-
-  let items = document.getElementsByTagName("dd");
-  for (const item of items) {
-    item.classList.toggle("dark");
-  }
-  document.cookie = "dark=true";  
-});
-
-
-function changeBorderIfDark() {
-  let isDark = false;
-  let bodyClassList = document.body.classList;
-  bodyClassList.forEach((className) => {
-    if (className === "dark") {
-      isDark = true;
-    }
-  });
-
-  let items = document.getElementsByTagName("dd");
-
-  if (isDark) {
-    for (const item of items) {
-      item.classList.add("dark");
-    }
-  }
-}
-
-if (getCookie("dark") != "true") {
-  document.body.classList.add("dark");
-  document.getElementById("tracklist-head").classList.add("dark");
-  document.getElementById("main-heading").classList.add("light");
-  let buttons = document.getElementsByTagName("button");
-  for (const button of buttons) {
-    button.classList.add("dark");
-  }
-
-  let isDark = false;
-  let bodyClassList = document.body.classList;
-  bodyClassList.forEach((className) => {
-    if (className === "dark") {
-      isDark = true;
-    }
-  });
-
-  let items = document.getElementsByTagName("dd");
-  for (const item of items) {
-    item.classList.add("dark");
-  }
-  
-} 

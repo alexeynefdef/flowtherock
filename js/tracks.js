@@ -1,34 +1,7 @@
-function isLoggedIn() {
-  if (getCookie("loggedin") != "true") {
-    window.open("./login.html", "_self");
-  } else {
-    reloadPlaylist(getUrlParam("playlistId"));
-  }
+function onLoad() {
+  let id = getUrlParam("playlistId");
+  loadPlaylist(id);
 }
-
-if (getCookie("dark") != "true") {
-  document.body.classList.add("dark");
-  document.getElementById("tracklist-head").classList.add("dark");
-  document.getElementById("main-heading").classList.add("light");
-  let buttons = document.getElementsByTagName("button");
-  for (const button of buttons) {
-    button.classList.add("dark");
-  }
-
-  let isDark = false;
-  let bodyClassList = document.body.classList;
-  bodyClassList.forEach((className) => {
-    if (className === "dark") {
-      isDark = true;
-    }
-  });
-
-  let items = document.getElementsByTagName("dd");
-  for (const item of items) {
-    item.classList.add("dark");
-  }
-  
-} 
 
 function getUrlParam(param) {
   let query = window.location.search;
@@ -37,31 +10,10 @@ function getUrlParam(param) {
 }
 
 function backToPlaylists() {
-  window.open("./playlists.html", "_self");
+  window.open("./index.html", "_self");
 }
 
-function loadPlaylist() {
-  document.getElementById("tracklist").innerHTML =
-    "<dt id='tracklist-head' class='tracklist_item tracklist_item-head'>" +
-    "<div class='tracklist_item-head-data'>Title</div>" +
-    "<div class='tracklist_item-head-data'>Artist</div>" +
-    "<div class='tracklist_item-head-data'>BPM</div>" +
-    "<div class='tracklist_item-head-data'>Key</div>" +
-    "</dt>";
-  document.getElementById("loader_wrapper").classList.add("loading");
-  document.getElementById("footer").classList.remove("loaded");
-  const opt = {
-    method: "GET",
-    headers: new Headers({
-      "Access-Control-Allow-Origin": "http://164.90.185.125:8080",
-    }),
-  };
-  fetch("http://164.90.185.125:8080/flowtherock/playlist", opt)
-    .then((response) => response.json())
-    .then((json) => parseResponse(json));
-}
-
-function reloadPlaylist(playlistId) {
+function loadPlaylist(playlistId) {
   document.getElementById("tracklist").innerHTML =
     "<dt id='tracklist-head' class='tracklist_item tracklist_item-head'>" +
     "<div class='tracklist_item-head-data'>Title</div>" +
@@ -78,13 +30,14 @@ function reloadPlaylist(playlistId) {
     }),
   };
   document.getElementById("loader_wrapper").classList.add("loading");
-  fetch("http://164.90.185.125:8080/flowtherock/playlist/load?playlistId=" + playlistId, opt)
+  fetch("http://164.90.185.125:8080/flowtherock/api/playlist/load?playlistId=" + playlistId, opt)
     .then((response) => response.json())
     .then((json) => parseResponse(json));
 }
 
 function sortPlaylist(trackId) {
   showNowPlaying(trackId);
+  pausePreview();
   const opt = {
     method: "GET",
     headers: new Headers({
@@ -101,13 +54,9 @@ function sortPlaylist(trackId) {
     "<div class='tracklist_item-head-data'>Key</div>" +
     "</dt>";
   fetch(
-    "http://164.90.185.125:8080/flowtherock/playlist/sort?trackId=" + trackId,
-    opt
-  )
-    .then((response) => {
-      return response.json();
-    })
-    .then((json) => parseResponse(json));
+    "http://164.90.185.125:8080/flowtherock/api/playlist/sort?trackId=" + trackId, opt)
+  .then((response) => response.json())
+  .then((json) => parseResponse(json));
 }
 
 function parseResponse(responseData) {
@@ -117,13 +66,22 @@ function parseResponse(responseData) {
 
   document.getElementById("loader_wrapper").classList.remove("loading");
   document.getElementById("footer").classList.add("loaded");
-  changeBorderIfDark();
+}
+
+function millisToMinutesAndSeconds(millis) {
+  var minutes = Math.floor(millis / 60000);
+  var seconds = ((millis % 60000) / 1000).toFixed(0);
+  return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
 }
 
 async function showNowPlaying(trackId) {
   const track = document.getElementById(trackId);
   document.getElementById("now_playing").innerHTML = "";
   document.getElementById("now_playing").appendChild(track);
+  const album = track.getAttribute("album");
+  const preview = track.getAttribute("preview");
+  const duration = millisToMinutesAndSeconds(track.getAttribute("duration"));
+  const camelot = track.getAttribute("camelot");
   const node =
     "<dd " +
     'class="tracklist_item"' +
@@ -140,7 +98,76 @@ async function showNowPlaying(trackId) {
     track.childNodes[1].textContent +
     "</div>" +
     "</dd>";
+  let addBox = "";
+  addBox += '<dt id="additional-data-head" class="tracklist_item">'
+      addBox += '<div>';
+      addBox += "Preview";
+      addBox += '</div>';
+      addBox += '<div>';
+      addBox += "Album";
+      addBox += '</div>';
+      addBox += '<div>';
+      addBox += "Duration";
+      addBox += '</div>';
+      addBox += '<div>';
+      addBox += "Camelot";
+      addBox += '</div>';
+    addBox += '</dt>';
+    addBox += '<dd id="additional-data" class="tracklist_item">';
+
+    if (preview != "null" && preview != "") {
+    addBox += '<div id="preview-play">';
+    addBox += '<form action="javascript:;" onsubmit="playPreview(';
+    addBox += "'";
+    addBox += preview;
+    addBox += "'";
+    addBox += ')">';
+    addBox += '<button class="player" type="submit"><i class="fa-solid fa-play"></i></button>'
+    addBox += '</form>';
+    addBox += '</div>';
+    addBox += '<div id="preview-pause" class="hide-play">';
+    addBox += '<form class="player" action="javascript:;" onsubmit="pausePreview()">';
+    addBox += '<button class="player" type="submit"><i class="fa-solid fa-pause"></i></button>'
+    addBox += '</form>';
+    addBox += '</div>';
+    } else {
+      addBox += '<div>';
+      addBox += "NO PREVIEW";
+      addBox += '</div>';
+    }
+    addBox += '<div>';
+    addBox += album;
+    addBox += '</div>';
+    addBox += '<div>';
+    addBox += duration;
+    addBox += '</div>';
+    addBox += '<div>';
+    addBox += camelot;
+    addBox += '</div>';
+  addBox += '</dd>';
   document.getElementById("played").innerHTML += node;
+  document.getElementById("now_playing_add").innerHTML = addBox;
+}
+
+let currentAudio = null;
+
+function playPreview(url) {
+  if(currentAudio == null) {
+    currentAudio = new Audio(url);
+    currentAudio.play();
+    document.getElementById("preview-play").classList.add("hide-play");
+    document.getElementById("preview-pause").classList.remove("hide-play");
+  }
+}
+
+function pausePreview() {
+  if(currentAudio != null) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    document.getElementById("preview-pause").classList.add("hide-play");
+    document.getElementById("preview-play").classList.remove("hide-play");
+    currentAudio = null;
+  }
 }
 
 function appendListItemToTrackList(item) {
@@ -158,10 +185,14 @@ function appendListItemToTrackList(item) {
     ' id="' +
     trackId +
     '"' +
-    " onclick=\"sortPlaylist('" +
+    ' onclick="sortPlaylist(' + "'" +
     trackId +
-    "')\"" +
-    '">' +
+    "')" + '" ' +
+    'album="' + item.album + '"' +
+    'preview="' + item.previewUrl + '"' +
+    'duration="' + item.duration + '"' +
+    'camelot="' + item.camelot + '"' +
+    '>' +
     "<div class='track_title'>" +
     item.title +
     "</div>" +
@@ -189,54 +220,6 @@ function savePlaylist() {
     console.log(track);
   }
 }
-
-function changeBorderIfDark() {
-  let isDark = false;
-  let bodyClassList = document.body.classList;
-  bodyClassList.forEach((className) => {
-    if (className === "dark") {
-      isDark = true;
-    }
-  });
-
-  let items = document.getElementsByTagName("dd");
-
-  if (isDark) {
-    for (const item of items) {
-      item.classList.add("dark");
-    }
-  }
-}
-
-//toggle
-const chk = document.getElementById("chk");
-
-chk.addEventListener("change", () => {
-  document.body.classList.toggle("dark");
-  document.getElementById("tracklist-head").classList.toggle("dark");
-  document.getElementById("main-heading").classList.toggle("light");
-  let buttons = document.getElementsByTagName("button");
-  for (const button of buttons) {
-    button.classList.toggle("dark");
-  }
-
-  let isDark = false;
-  let bodyClassList = document.body.classList;
-  bodyClassList.forEach((className) => {
-    if (className === "dark") {
-      isDark = true;
-    }
-  });
-
-  let items = document.getElementsByTagName("dd");
-  for (const item of items) {
-    item.classList.toggle("dark");
-  }
-
-  document.cookie = "dark=true";
-});
-
-
 
 //side card
 document.getElementById("side_button").addEventListener("click", () => {
